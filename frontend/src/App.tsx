@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+// Importación del Login
+import Login from './modules/login/login.tsx';
 
 // Importación de tus 13 módulos
 import { DashboardModule } from './modules/dashboard/dashboard';
@@ -16,6 +19,13 @@ import { AuditoriaModule } from './modules/auditoria/auditoria';
 import { ConfiguracionModule } from './modules/configuracion/configuracion';
 
 export function App() {
+  // Estados de autenticación gestionados con localStorage
+  const [token, setToken] = useState<string | null>(localStorage.getItem('access_token'));
+  const [user, setUser] = useState<any>(
+    localStorage.getItem('user_info') ? JSON.parse(localStorage.getItem('user_info')!) : null
+  );
+
+  // Estados de navegación de tus 13 módulos
   const [activeModule, setActiveModule] = useState<string>('dashboard');
   const [activeTitle, setActiveTitle] = useState<string>('1. EJECUTIVO / DASHBOARD');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
@@ -25,25 +35,43 @@ export function App() {
     setActiveTitle(title);
   };
 
+  const handleLoginSuccess = (newToken: string, userData: any) => {
+    setToken(newToken);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_info');
+    setToken(null);
+    setUser(null);
+  };
+
   const renderModule = () => {
     switch (activeModule) {
       case 'dashboard': return <DashboardModule isDarkMode={isDarkMode} />;
-      case 'eventos': return <EventosModule />;
-      case 'mapa': return <MapaModule />;
-      case 'analisis': return <AnalisisModule />;
-      case 'datos': return <DatosModule />;
-      case 'modelos-ml': return <ModelosMlModule />;
-      case 'estimaciones': return <EstimacionesModule />;
-      case 'alertas': return <AlertasModule />;
-      case 'fuentes': return <FuentesModule />;
-      case 'reportes': return <ReportesModule />;
-      case 'usuarios': return <UsuariosModule />;
-      case 'auditoria': return <AuditoriaModule />;
-      case 'configuracion': return <ConfiguracionModule />;
+      case 'eventos': return <EventosModule isDarkMode={isDarkMode} />;
+      case 'mapa': return <MapaModule isDarkMode={isDarkMode} />;
+      case 'analisis': return <AnalisisModule isDarkMode={isDarkMode} />;
+      case 'datos': return <DatosModule isDarkMode={isDarkMode} />;
+      case 'modelos-ml': return <ModelosMlModule isDarkMode={isDarkMode} />;
+      case 'estimaciones': return <EstimacionesModule isDarkMode={isDarkMode} />;
+      case 'alertas': return <AlertasModule isDarkMode={isDarkMode} />;
+      case 'fuentes': return <FuentesModule isDarkMode={isDarkMode} />;
+      case 'reportes': return <ReportesModule isDarkMode={isDarkMode} />;
+      case 'usuarios': return <UsuariosModule isDarkMode={isDarkMode} />;
+      case 'auditoria': return <AuditoriaModule isDarkMode={isDarkMode} />;
+      case 'configuracion': return <ConfiguracionModule isDarkMode={isDarkMode} />;
       default: return <DashboardModule isDarkMode={isDarkMode} />;
     }
   };
 
+  // SI NO HAY TOKEN, MUESTRA LA PANTALLA DE LOGIN
+  if (!token) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // SI HAY SESIÓN ACTIVA, MUESTRA TU DASHBOARD COMPLETO CON LOS 13 MÓDULOS
   return (
     <div className={`flex h-screen ${isDarkMode ? 'bg-[#070b14] text-slate-100' : 'bg-slate-100 text-slate-900'} font-sans antialiased overflow-hidden select-none transition-colors duration-200`}>
       
@@ -64,14 +92,14 @@ export function App() {
           
           {/* Ejecutivo y Operación */}
           <div className="space-y-1">
-            <div className="text-slate-500 font-bold uppercase tracking-wider px-2 mb-1.5">1. Ejecutivo & Operación</div>
+            <div className="text-slate-500 font-bold uppercase tracking-wider px-2 mb-1.5">Ejecutivo & Operación</div>
             <button
               onClick={() => handleNavClick('dashboard', '1. EJECUTIVO / DASHBOARD')}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
                 activeModule === 'dashboard' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-semibold' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
               }`}
             >
-              <span>1. Dashboard</span>
+              <span>Dashboard</span>
               <span className="text-[10px] bg-blue-950 text-blue-300 px-1.5 py-0.5 rounded">Live</span>
             </button>
             <button
@@ -189,15 +217,38 @@ export function App() {
 
         </nav>
 
-        {/* Footer del usuario */}
-        <div className={`p-4 ${isDarkMode ? 'bg-[#05080e] border-slate-800/80' : 'bg-slate-950 border-slate-800'} border-t flex items-center space-x-3`}>
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xs">
-            AR
+        {/* Footer del usuario con opción de Cerrar Sesión */}
+        <div className={`p-4 ${isDarkMode ? 'bg-[#05080e] border-slate-800/80' : 'bg-slate-950 border-slate-800'} border-t flex items-center justify-between`}>
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-white text-xs shadow-md shadow-blue-600/30">
+              {user?.full_name ? user.full_name.split(' ').map((n: string) => n[0]).join('') : 'AR'}
+            </div>
+            <div className="truncate min-w-0">
+              <p className="text-xs font-bold text-slate-200 truncate">{user?.full_name || 'Administrador'}</p>
+              <p className="text-[10px] text-slate-400 truncate">{user?.email || 'analista@sismoplatform.com'}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold text-slate-200">Administrador</p>
-            <p className="text-[10px] text-slate-400">Rol: Analista</p>
-          </div>
+          
+          <button 
+            onClick={handleLogout}
+            title="Cerrar Sesión"
+            className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200 flex items-center justify-center group flex-shrink-0"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="w-4 h-4 transition-transform group-hover:translate-x-0.5"
+            >
+              <path d="M9 21H5a2 2 2 0 0 1-2-2V5a2 2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
         </div>
       </aside>
 
@@ -229,7 +280,7 @@ export function App() {
               🔔
             </button>
             <div className={`w-8 h-8 rounded-full ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-200 border-slate-300 text-slate-700'} border flex items-center justify-center text-xs font-bold`}>
-              AR
+              {user?.full_name ? user.full_name.split(' ').map((n: string) => n[0]).join('') : 'AR'}
             </div>
           </div>
         </header>

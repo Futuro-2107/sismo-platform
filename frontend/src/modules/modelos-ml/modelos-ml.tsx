@@ -1,32 +1,90 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-export const ModelosMlModule: React.FC = () => {
+interface ModelosMLProps {
+  isDarkMode?: boolean;
+}
+
+export const ModelosMlModule: React.FC<ModelosMLProps> = ({ isDarkMode = true }) => {
+  const [experiments, setExperiments] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/v1/ml/experiments')
+      .then((res) => res.json())
+      .then((data) => {
+        setExperiments(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error al cargar experimentos ML:', err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">Modelos de Machine Learning (Experimentos)</h1>
-      
-      <div className="bg-white shadow rounded-lg overflow-hidden border border-slate-200">
-        <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-          <thead className="bg-slate-50 text-slate-700">
-            <tr>
-              <th className="px-6 py-3 font-semibold">Modelo / Algoritmo</th>
-              <th className="px-6 py-3 font-semibold">Tarea / Objetivo</th>
-              <th className="px-6 py-3 font-semibold">Métrica Clave</th>
-              <th className="px-6 py-3 font-semibold">Estado</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 bg-white">
-            <tr>
-              <td className="px-6 py-4 font-medium text-slate-900">Random Forest v1.1</td>
-              <td className="px-6 py-4 text-slate-600">Clasificación por Rangos</td>
-              <td className="px-6 py-4 text-slate-600">F1-Score: 0.84</td>
-              <td className="px-6 py-4"><span className="text-xs bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-semibold">Aprobado</span></td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className={`text-xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+            Modelos de Machine Learning (Experimentos)
+          </h1>
+          <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'} mt-0.5`}>
+            Seguimiento de entrenamiento, hiperparámetros y métricas de rendimiento en producción
+          </p>
+        </div>
+      </div>
+
+      {/* Tabla de Modelos y Experimentos */}
+      <div className={`${isDarkMode ? 'bg-[#0a0f1d] border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'} border rounded-xl shadow-lg overflow-hidden`}>
+        <div className="p-4 border-b border-slate-800 flex justify-between items-center">
+          <h3 className="text-sm font-bold">Registro de Modelos Registrados</h3>
+          <span className="text-xs text-slate-400">Total: {experiments.length} experimentos</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className={`${isDarkMode ? 'bg-slate-900/80 text-slate-400' : 'bg-slate-100 text-slate-600'} uppercase font-medium`}>
+              <tr>
+                <th className="px-4 py-3">Modelo / Algoritmo</th>
+                <th className="px-4 py-3">Tarea / Objetivo</th>
+                <th className="px-4 py-3">Métrica Clave</th>
+                <th className="px-4 py-3">Estado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/50">
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">Cargando experimentos...</td>
+                </tr>
+              ) : experiments.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-slate-400">No hay experimentos registrados.</td>
+                </tr>
+              ) : (
+                experiments.map((exp) => (
+                  <tr key={exp.id} className="hover:bg-slate-800/20 transition-colors">
+                    <td className="px-4 py-3 font-medium">
+                      {exp.name} <span className="text-[10px] text-slate-400 block font-mono">Algoritmo: {exp.algorithm}</span>
+                    </td>
+                    <td className="px-4 py-3">{exp.task_type}</td>
+                    <td className="px-4 py-3 font-mono text-blue-400">
+                      F1-Score: {exp.metrics?.f1_score || 'N/A'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded-full text-[10px] font-semibold">
+                        Aprobado
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
 
+// Exportamos también con mayúscula por si acaso
+export const ModelosMLModule = ModelosMlModule;
 export default ModelosMlModule;
