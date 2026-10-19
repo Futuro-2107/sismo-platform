@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getSeismicEvents } from './services';
+import { getSeismicEvents } from './service';
 
 interface SeismicEventItem {
   id: string;
