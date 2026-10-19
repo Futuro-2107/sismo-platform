@@ -9,7 +9,10 @@ export const ReportesModule: React.FC<ReportesProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/reports/')
+    // Detecta la URL de Render en producción o usa localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/reports/`)
       .then((res) => res.json())
       .then((data) => {
         setReports(data);

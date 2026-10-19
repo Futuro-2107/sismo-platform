@@ -9,8 +9,11 @@ export const EstimacionesModule: React.FC<EstimacionesProps> = ({ isDarkMode }) 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    // Detecta dinámicamente la URL de Render en producción (Vercel) o localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     // Petición al backend
-    fetch('http://localhost:8000/api/v1/estimates/')
+    fetch(`${API_URL}/api/v1/estimates/`)
       .then((res) => res.json())
       .then((data) => {
         setEstimates(data);

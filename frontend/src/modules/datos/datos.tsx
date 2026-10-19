@@ -10,7 +10,9 @@ export const DatosModule: React.FC<DatosProps> = ({ isDarkMode = true }) => {
 
   const fetchDatasets = () => {
     setLoading(true);
-    fetch('http://127.0.0.1:8000/api/v1/datasets/')
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/datasets/`)
       .then((res) => res.json())
       .then((data) => {
         setDatasets(data);
@@ -27,7 +29,9 @@ export const DatosModule: React.FC<DatosProps> = ({ isDarkMode = true }) => {
   }, []);
 
   const handleCreateSnapshot = () => {
-    fetch('http://127.0.0.1:8000/api/v1/datasets/snapshot?name=sismos_peru_v1.csv&version=v1.0', {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/datasets/snapshot?name=sismos_peru_v1.csv&version=v1.0`, {
       method: 'POST',
     })
       .then((res) => res.json())

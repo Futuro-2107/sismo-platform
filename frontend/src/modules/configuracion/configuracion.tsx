@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ConfiguracionProps {
   isDarkMode: boolean;
@@ -16,6 +16,23 @@ export const ConfiguracionModule: React.FC<ConfiguracionProps> = ({ isDarkMode }
   });
 
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Opcional: Cargar configuraciones del backend al iniciar si ya están guardadas
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/config`)
+      .then((res) => {
+        if (res.ok) return res.json();
+      })
+      .then((data) => {
+        if (data) setSettings(prev => ({ ...prev, ...data }));
+      })
+      .catch((err) => {
+        console.log("Usando configuración local por defecto:", err);
+      });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -23,11 +40,32 @@ export const ConfiguracionModule: React.FC<ConfiguracionProps> = ({ isDarkMode }
     setSettings(prev => ({ ...prev, [name]: val }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulación de guardado de preferencias en la plataforma
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setLoading(true);
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    try {
+      // Intenta guardar también en el backend de Render si el endpoint existe
+      await fetch(`${API_URL}/api/v1/config`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      }).catch(() => {
+        // Si el endpoint del backend aún no está creado, simula el guardado localmente sin romper la app
+        console.warn("Guardado simulado localmente (endpoint de config no disponible en backend)");
+      });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error("Error al guardar la configuración:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,9 +170,10 @@ export const ConfiguracionModule: React.FC<ConfiguracionProps> = ({ isDarkMode }
           <div className={`pt-4 border-t flex justify-end ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
             <button 
               type="submit" 
-              className="px-4 py-2 bg-cyan-600 text-white font-medium text-sm rounded-lg hover:bg-cyan-700 transition shadow-sm"
+              disabled={loading}
+              className="px-4 py-2 bg-cyan-600 text-white font-medium text-sm rounded-lg hover:bg-cyan-700 transition shadow-sm disabled:opacity-50"
             >
-              Guardar Cambios
+              {loading ? 'Guardando...' : 'Guardar Cambios'}
             </button>
           </div>
         </form>

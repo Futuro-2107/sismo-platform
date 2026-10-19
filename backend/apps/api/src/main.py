@@ -26,10 +26,15 @@ app = FastAPI(
     redoc_url="/api/v1/redoc"
 )
 
-# --- 2. Configurar CORS corporativo para permitir el frontend ---
+# --- 2. Configurar CORS corporativo para permitir el frontend en desarrollo y producción ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://sismo-platform-mc56.onrender.com",
+        "*"  # Permite que Vercel u otros clientes consuman la API sin bloqueos de CORS
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

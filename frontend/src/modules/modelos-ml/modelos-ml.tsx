@@ -9,7 +9,10 @@ export const ModelosMlModule: React.FC<ModelosMLProps> = ({ isDarkMode = true })
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/ml/experiments')
+    // Detecta la URL de Render en producción o usa localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/ml/experiments`)
       .then((res) => res.json())
       .then((data) => {
         setExperiments(data);

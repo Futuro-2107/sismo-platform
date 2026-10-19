@@ -14,7 +14,9 @@ export const AnalisisModule: React.FC<AnalisisProps> = ({ isDarkMode = true }) =
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/analytics/summary')
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/analytics/summary`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al consultar el servicio de analítica');
         return res.json();
@@ -37,7 +39,7 @@ export const AnalisisModule: React.FC<AnalisisProps> = ({ isDarkMode = true }) =
             Análisis Estadístico e Histórico
           </h1>
           <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'} mt-0.5`}>
-            Evaluación descriptiva de patrones, frecuencias y distribuciones sísmicas[cite: 3, 5, 9]
+            Evaluación descriptiva de patrones, frecuencias y distribuciones sísmicas
           </p>
         </div>
         <div className="flex space-x-2">
@@ -105,7 +107,7 @@ export const AnalisisModule: React.FC<AnalisisProps> = ({ isDarkMode = true }) =
         } border p-5 rounded-xl shadow-lg space-y-4 transition-colors`}>
           <div className="flex justify-between items-center">
             <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-              Distribución por Rangos de Magnitud[cite: 5, 9]
+              Distribución por Rangos de Magnitud
             </h3>
             <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">
               Frecuencia Relativa
@@ -145,7 +147,7 @@ export const AnalisisModule: React.FC<AnalisisProps> = ({ isDarkMode = true }) =
           <div className="flex justify-between items-center">
             <div>
               <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                Relación Magnitud vs. Profundidad (km)[cite: 5, 9]
+                Relación Magnitud vs. Profundidad (km)
               </h3>
               <p className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                 Distribución de registros observados (sin atribuir causalidad directa)

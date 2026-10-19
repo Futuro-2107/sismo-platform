@@ -9,8 +9,11 @@ export const UsuariosModule: React.FC<UsuariosProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    // Detecta la URL de Render en producción o usa localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     // Petición al backend para obtener los perfiles y roles de usuario
-    fetch('http://localhost:8000/api/v1/users/')
+    fetch(`${API_URL}/api/v1/users/`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);

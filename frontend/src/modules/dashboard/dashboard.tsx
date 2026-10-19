@@ -10,7 +10,9 @@ export const DashboardModule: React.FC<DashboardProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/dashboard/summary')
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/dashboard/summary`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al conectar con el servidor');
         return res.json();
@@ -72,7 +74,7 @@ export const DashboardModule: React.FC<DashboardProps> = ({ isDarkMode }) => {
         <div className={`${isDarkMode ? 'bg-[#0a0f1d] border-slate-800/80 text-white' : 'bg-white border-slate-200 text-slate-900'} border p-5 rounded-xl shadow-lg transition-colors`}>
           <p className={`text-xs font-semibold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'} uppercase tracking-wider`}>Alertas Enviadas</p>
           <p className="text-3xl font-extrabold mt-2">2</p>
-          <span className="text-[11px] text-blue-500 font-medium mt-1 block">Canales oficiales verificados[cite: 2]</span>
+          <span className="text-[11px] text-blue-500 font-medium mt-1 block">Canales oficiales verificados</span>
         </div>
       </div>
 
@@ -84,7 +86,7 @@ export const DashboardModule: React.FC<DashboardProps> = ({ isDarkMode }) => {
 
       {/* Mini Gráfica Dinámica */}
       <div className={`${isDarkMode ? 'bg-[#0a0f1d] border-slate-800/80 text-white' : 'bg-white border-slate-200 text-slate-900'} border p-5 rounded-xl shadow-lg space-y-3 transition-colors`}>
-        <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Frecuencia Horaria de Eventos (Hoy)[cite: 3, 39]</h3>
+        <h3 className={`text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Frecuencia Horaria de Eventos (Hoy)</h3>
         <div className="h-40 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={miniChartData}>

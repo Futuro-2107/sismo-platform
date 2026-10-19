@@ -9,7 +9,9 @@ export const FuentesModule: React.FC<FuentesProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/v1/sources/')
+    const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
+    fetch(`${API_URL}/api/v1/sources/`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al obtener las fuentes de datos');
         return res.json();
@@ -84,7 +86,7 @@ export const FuentesModule: React.FC<FuentesProps> = ({ isDarkMode }) => {
       {/* Nota de seguridad exigida por el PDF */}
       <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-xl text-slate-400 text-xs">
         <strong className="block font-semibold mb-1 text-slate-300 uppercase tracking-wider">Seguridad de Credenciales:</strong>
-        Los secretos de API y credenciales de conexión se gestionan mediante referencias cifradas y variables de entorno seguras, nunca en texto plano[cite: 6, 12].
+        Los secretos de API y credenciales de conexión se gestionan mediante referencias cifradas y variables de entorno seguras, nunca en texto plano.
       </div>
     </div>
   );

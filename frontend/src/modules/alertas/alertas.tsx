@@ -9,7 +9,10 @@ export const AlertasModule: React.FC<AlertasProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/alerts/rules')
+    // Detecta dinámicamente la URL de Render en producción (Vercel) o localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/v1/alerts/rules`)
       .then((res) => res.json())
       .then((data) => {
         setRules(data);

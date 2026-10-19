@@ -9,8 +9,11 @@ export const AuditoriaModule: React.FC<AuditoriaProps> = ({ isDarkMode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    // Detecta la URL de Render en producción o usa localhost en desarrollo
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
     // Petición al endpoint del backend para obtener la bitácora de auditoría
-    fetch('http://localhost:8000/api/v1/audit/logs')
+    fetch(`${API_URL}/api/v1/audit/logs`)
       .then((res) => res.json())
       .then((data) => {
         setLogs(data);
